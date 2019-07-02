@@ -1,7 +1,6 @@
 import pika
-import helper
 
-nyse_path = 'uploads/nyse/'
+from .helper import get_stock_symbols, setup
 
 EXCHANGES = ['nyse', 'nasdaq']
 
@@ -14,11 +13,16 @@ def dispatch(channel, message):
 
 
 def run():
-    connection, channel = helper.setup('task_queue')
-    symbols = helper.get_stock_symbols(EXCHANGES)
-    for symbol in symbols:
-        print(symbol)
-        # dispatch(channel, ac_url)
+    cnt = 0
+    connection, channel = setup('task_queue')
+    for exchange in EXCHANGES:
+        symbols = get_stock_symbols(exchange)
+        for sym in symbols:
+            ex_sym = sym + '@' + exchange
+            dispatch(channel, ex_sym)
+            cnt += 1
+            if cnt >= 2:
+                break
     connection.close()
 
 if __name__ == "__main__":
