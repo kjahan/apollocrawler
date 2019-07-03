@@ -1,29 +1,25 @@
 import pika
 
-from .helper import get_stock_symbols, setup
+from .helper import get_stock_symbols, setup, dispatch
 
-EXCHANGES = ['nyse', 'nasdaq']
+STOCK_EXCHANGES = ['nyse', 'nasdaq']
 
-def dispatch(channel, message):
-    channel.basic_publish(exchange='', 
-        routing_key='task_queue',
-        body=message,
-        properties=pika.BasicProperties(delivery_mode = 2)) #make message persistent
-    print("Sent %r" % message)
-
-
-def run():
+def submit_stock_symbols():
     cnt = 0
+    stop = False
     connection, channel = setup('task_queue')
-    for exchange in EXCHANGES:
+    for exchange in STOCK_EXCHANGES:
         symbols = get_stock_symbols(exchange)
         for sym in symbols:
             ex_sym = sym + '@' + exchange
             dispatch(channel, ex_sym)
             cnt += 1
-            if cnt >= 2:
+            if cnt >= 100:
+                stop = True
                 break
+        if stop:
+            break
     connection.close()
 
 if __name__ == "__main__":
-    run()
+    submit_stock_symbols()
