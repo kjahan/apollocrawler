@@ -1,0 +1,81 @@
+import pika
+import multiprocessing
+import sys
+import threading
+import time
+import json
+
+from .helper import download, train_model
+from .utils.store_helper import StoreHelper
+from .utils.rmq_helper import setup
+from .utils.constants import STOCK_STATS_FN
+from apolloengine.encoder import StockEncoder
+
+
+DEBUG = False
+DELIMITER = '@'
+DAYS_PARAM = 90
+MODEL_FRESH_TIME = 24*3600*1000
+lock = multiprocessing.Lock()
+
+connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+storing_channel = connection.channel()
+
+storing_channel.exchange_declare(exchange='direct_logs', exchange_type='direct')
+
+# storage = StoreHelper('nyse', STOCK_STATS_FN)
+storage = StoreHelper('nyse')
+
+def callback(ch, method, properties, ex_symbol):
+    if DEBUG:
+        print("Received %r" % ex_symbol)
+    items = ex_symbol.decode('utf-8').split(DELIMITER)
+    symbol, exchange = items
+    try:
+        print('Processing {}@{}'.format(symbol, exchange))
+        model_age = storage.get_model_age(symbol)
+        if model_age > MODEL_FRESH_TIME:
+            # less than 24 hours so update the model!
+            history_data_size = download(symbol, exchange)
+            if history_data_size >= DAYS_PARAM:
+                stock_obj = train_model(symbol, exchange, DAYS_PARAM)
+                # with lock:
+                #     save_model(stock_obj)
+                # json.dumps(stock_obj, cls=StockEncoder)
+                storing_channel.basic_publish(exchange='direct_logs', routing_key='model', body=json.dumps(stock_obj, cls=StockEncoder))
+            else:
+                print('Not enough historical data for {}@{} - history size: {}'.format(symbol, exchange, history_data_size))
+        else:
+            print('Model for {}@{} is fresh!'.format(symbol, exchange))
+    except Exception as e:
+        print(str(e))
+        pass
+    ch.basic_ack(delivery_tag = method.delivery_tag)
+
+def process_stock_symbols():
+    connection, channel = setup('stock_queue')
+    print('Waiting for stock symbol to process. To exit press CTRL+C')
+    channel.basic_qos(prefetch_count=1)
+    channel.basic_consume('task_queue', callback)
+    channel.start_consuming()
+
+if __name__ == "__main__":
+    process_stock_symbols()
+    # t1 = threading.Thread(target=process_stock_symbols, args=[])
+    # t2 = threading.Thread(target=process_stock_symbols, args=[])
+    # t3 = threading.Thread(target=process_stock_symbols, args=[])
+    # t4 = threading.Thread(target=process_stock_symbols, args=[])
+    # t5 = threading.Thread(target=process_stock_symbols, args=[])
+    # t6 = threading.Thread(target=process_stock_symbols, args=[])
+    # t1.start()
+    # t2.start()
+    # t3.start()
+    # t4.start()
+    # t5.start()
+    # t6.start()
+    # t1.join()
+    # t2.join()
+    # t3.join()
+    # t4.join()
+    # t5.join()
+    # t6.join()
