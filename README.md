@@ -26,6 +26,8 @@ pip install requests
 
 pip install pika
 
+pip install psycopg2
+
 ## Steps to install RMQ in MacOS and starting rabbitmq:
 
 brew update
