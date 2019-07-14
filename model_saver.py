@@ -29,15 +29,12 @@ print(' [*] Waiting for stocks model. To exit press CTRL+C')
 
 def callback(ch, method, properties, body):
 	str_model = body.decode('utf-8')
-	dict_model = ast.literal_eval(str_model)
-	stock = Stock(dict_model['symbol'], 
-			# pd.DataFrame.from_dict(dict_model['history_prices']),
-			None,
-			dict_model['history_slope'],
-			dict_model['future_slope'], 
-			dict_model['timestamp'])
-	print(" [x] %r:%r" % (method.routing_key, stock.symbol))
-	storage.update_model(dict_model)
+	try:
+		dict_model = ast.literal_eval(str_model)
+		print(" [x] %r:%r" % (method.routing_key, dict_model['symbol']))
+		storage.update_model(dict_model)
+	except ValueError:
+		pass
 
 
 channel.basic_consume(

@@ -10,11 +10,21 @@ from apolloengine.stock import Stock
 class StoreHelper:
     def __init__(self, exchange, filename=None):
         self.exchange = exchange
+        self.stocks_stats = {}
         if filename:
             self.filename = filename
+            try:
+                with open(self.filename, 'rb') as fp:
+                    stocks_stats = pickle.load(fp)
+            except FileNotFoundError:
+                print("Model file doesn't exist!")
+                pass
         else:
             self.filename = None
             self.connect_to_db()
+            data = self.get_model()
+            if len(data) > 0:
+                self.stocks_stats = data[0][0]
 
     def connect_to_db(self):
         self.conn = psycopg2.connect("dbname='jahan' user='jahan' host='localhost' password=''")
@@ -84,30 +94,35 @@ class StoreHelper:
             return self.get_model_age_from_pg(symbol)
 
     def get_model_age_from_file(self, symbol):
-        stocks_stats = {}
-        try:
-            with open(self.filename, 'rb') as fp:
-                stocks_stats = pickle.load(fp)
-        except FileNotFoundError:
-            print("Model file doesn't exist!")
-            pass
         current_ts = int(round(time.time() * 1000)) # in ms
         model_age = 90*24*3600*1000 # 90 days old model by default
-        if symbol in stocks_stats:
-            previous_ts = stocks_stats[symbol].timestamp
+        if symbol in self.stocks_stats:
+            previous_ts = self.stocks_stats[symbol].timestamp
             model_age = current_ts - previous_ts
         return model_age
 
     def get_model_age_from_pg(self, symbol):
         model_age = 90*24*3600*1000 # 90 days old model by default
         data = self.get_model()
-        if len(data) > 0:
-            stocks_stats = data[0][0]
+        if self.stocks_stats:
             current_ts = int(round(time.time() * 1000)) # in ms
-            if symbol in stocks_stats:
-                previous_ts = stocks_stats[symbol]['timestamp']
+            if symbol in self.stocks_stats:
+                previous_ts = self.stocks_stats[symbol]['timestamp']
                 model_age = current_ts - previous_ts
         return model_age
+
+    def get_stocks_from_pg(self):
+        stock_symbols = set([])
+        stock_stats = []
+        data = self.get_model()
+        if len(data) > 0:
+            stocks_stats = data[0][0]
+            stock_symbols = set(stocks_stats.keys())
+            for symbol, stock in stocks_stats.items():
+                stock_obj = Stock(symbol, stock["exchange"], None, 
+                    stock["history_slope"], stock["future_slope"])
+                stock_stats.append(stock_obj)
+        return stock_symbols, stock_stats
 
     def cleanup_pg(self):
         self.cursor.close()

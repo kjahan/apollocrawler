@@ -1,7 +1,5 @@
 import pika
-import multiprocessing
 import sys
-import threading
 import time
 import json
 
@@ -15,8 +13,7 @@ from apolloengine.encoder import StockEncoder
 DEBUG = False
 DELIMITER = '@'
 DAYS_PARAM = 90
-MODEL_FRESH_TIME = 24*3600*1000
-lock = multiprocessing.Lock()
+MODEL_FRESH_TIME = 7*24*3600*1000   # we require 7 days model freshness!
 
 connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
 storing_channel = connection.channel()
@@ -39,9 +36,6 @@ def callback(ch, method, properties, ex_symbol):
             history_data_size = download(symbol, exchange)
             if history_data_size >= DAYS_PARAM:
                 stock_obj = train_model(symbol, exchange, DAYS_PARAM)
-                # with lock:
-                #     save_model(stock_obj)
-                # json.dumps(stock_obj, cls=StockEncoder)
                 storing_channel.basic_publish(exchange='direct_logs', routing_key='model', body=json.dumps(stock_obj, cls=StockEncoder))
             else:
                 print('Not enough historical data for {}@{} - history size: {}'.format(symbol, exchange, history_data_size))
@@ -61,21 +55,3 @@ def process_stock_symbols():
 
 if __name__ == "__main__":
     process_stock_symbols()
-    # t1 = threading.Thread(target=process_stock_symbols, args=[])
-    # t2 = threading.Thread(target=process_stock_symbols, args=[])
-    # t3 = threading.Thread(target=process_stock_symbols, args=[])
-    # t4 = threading.Thread(target=process_stock_symbols, args=[])
-    # t5 = threading.Thread(target=process_stock_symbols, args=[])
-    # t6 = threading.Thread(target=process_stock_symbols, args=[])
-    # t1.start()
-    # t2.start()
-    # t3.start()
-    # t4.start()
-    # t5.start()
-    # t6.start()
-    # t1.join()
-    # t2.join()
-    # t3.join()
-    # t4.join()
-    # t5.join()
-    # t6.join()
