@@ -4,7 +4,7 @@ from random import shuffle
 from .helper import get_stock_symbols
 from .utils.rmq_helper import setup, dispatch
 
-STOCK_EXCHANGES = ['nyse', 'nasdaq']
+STOCK_EXCHANGES = ['tsx', 'nyse', 'nasdaq']
 
 def submit_stock_symbols():
     cnt = 0

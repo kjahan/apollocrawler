@@ -20,8 +20,8 @@ storing_channel = connection.channel()
 
 storing_channel.exchange_declare(exchange='direct_logs', exchange_type='direct')
 
-# storage = StoreHelper('nyse', STOCK_STATS_FN)
-storage = StoreHelper('nyse')
+# storage = StoreHelper(STOCK_STATS_FN)
+storage = StoreHelper()
 
 def callback(ch, method, properties, ex_symbol):
     if DEBUG:
@@ -30,7 +30,7 @@ def callback(ch, method, properties, ex_symbol):
     symbol, exchange = items
     try:
         print('Processing {}@{}'.format(symbol, exchange))
-        model_age = storage.get_model_age(symbol)
+        model_age = storage.get_model_age(symbol, exchange)
         if model_age > MODEL_FRESH_TIME:
             # less than 24 hours so update the model!
             history_data_size = download(symbol, exchange)

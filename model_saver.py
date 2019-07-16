@@ -17,8 +17,8 @@ channel.exchange_declare(exchange='direct_logs', exchange_type='direct')
 result = channel.queue_declare(queue='', exclusive=True)
 queue_name = result.method.queue
 
-# storage = StoreHelper('nyse', STOCK_STATS_FN)
-storage = StoreHelper('nyse')
+# storage = StoreHelper(STOCK_STATS_FN)
+storage = StoreHelper()
 
 # for severity in severities:
 channel.queue_bind(

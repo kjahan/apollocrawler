@@ -8,8 +8,7 @@ from apolloengine.stock import Stock
 
 
 class StoreHelper:
-    def __init__(self, exchange, filename=None):
-        self.exchange = exchange
+    def __init__(self, filename=None):
         self.stocks_stats = {}
         if filename:
             self.filename = filename
@@ -22,9 +21,7 @@ class StoreHelper:
         else:
             self.filename = None
             self.connect_to_db()
-            data = self.get_model()
-            if len(data) > 0:
-                self.stocks_stats = data[0][0]
+
 
     def connect_to_db(self):
         self.conn = psycopg2.connect("dbname='jahan' user='jahan' host='localhost' password=''")
@@ -58,27 +55,29 @@ class StoreHelper:
 
     def update_pg(self, dict_model):
         symbol = dict_model["symbol"]
-        data = self.get_model()
+        exchange = dict_model["exchange"]
+        data = self.get_model(exchange)
         if len(data) > 0:
             stocks_stats = data[0][0]
             stocks_stats[symbol] = dict_model
             json_model = json.dumps(stocks_stats)
-            self.cursor.execute("UPDATE stock_models SET updated = LOCALTIMESTAMP, model = Json(%s) WHERE exchange=%s", (json_model, self.exchange))
+            self.cursor.execute("UPDATE stock_models SET updated = LOCALTIMESTAMP, model = Json(%s) WHERE exchange=%s", (json_model, exchange))
             self.conn.commit() # <- We MUST commit to reflect the inserted data
         else:
             self.insert_single_stock_model(dict_model)
 
-    def get_model(self):
-        self.cursor.execute("SELECT model from stock_models where exchange=%s", (self.exchange,))
+    def get_model(self, exchange):
+        self.cursor.execute("SELECT model from stock_models where exchange=%s", (exchange,))
         rows = self.cursor.fetchall()
         return rows
 
     def insert_single_stock_model(self, dict_model):
         symbol = dict_model["symbol"]
+        exchange = dict_model["exchange"]
         stocks_stats = {}
         stocks_stats[symbol] = dict_model
         json_model = json.dumps(stocks_stats)
-        self.cursor.execute("INSERT INTO stock_models (created, updated, model, exchange) VALUES (LOCALTIMESTAMP, LOCALTIMESTAMP, Json(%s), %s)", (json_model, self.exchange))
+        self.cursor.execute("INSERT INTO stock_models (created, updated, model, exchange) VALUES (LOCALTIMESTAMP, LOCALTIMESTAMP, Json(%s), %s)", (json_model, exchange))
         self.conn.commit() # <- We MUST commit to reflect the inserted data
 
     def empty_model(self):
@@ -87,13 +86,13 @@ class StoreHelper:
         with open(self.filename, 'wb') as fp:
             pickle.dump(stocks_stats, fp)
 
-    def get_model_age(self, symbol):
+    def get_model_age(self, symbol, exchange):
         if self.filename:
-            return self.get_model_age_from_file(symbol)
+            return self.get_model_age_from_file(symbol, exchange)
         else:
-            return self.get_model_age_from_pg(symbol)
+            return self.get_model_age_from_pg(symbol, exchange)
 
-    def get_model_age_from_file(self, symbol):
+    def get_model_age_from_file(self, symbol, exchange):
         current_ts = int(round(time.time() * 1000)) # in ms
         model_age = 90*24*3600*1000 # 90 days old model by default
         if symbol in self.stocks_stats:
@@ -101,9 +100,13 @@ class StoreHelper:
             model_age = current_ts - previous_ts
         return model_age
 
-    def get_model_age_from_pg(self, symbol):
+    def get_model_age_from_pg(self, symbol, exchange):
         model_age = 90*24*3600*1000 # 90 days old model by default
-        data = self.get_model()
+        if not self.stocks_stats:
+            data = self.get_model(exchange)
+            if len(data) > 0:
+                # cashe stocks data to minimize query time
+                self.stocks_stats = data[0][0]        
         if self.stocks_stats:
             current_ts = int(round(time.time() * 1000)) # in ms
             if symbol in self.stocks_stats:
@@ -111,10 +114,10 @@ class StoreHelper:
                 model_age = current_ts - previous_ts
         return model_age
 
-    def get_stocks_from_pg(self):
+    def get_stocks_from_pg(self, exchange):
         stock_symbols = set([])
         stock_stats = []
-        data = self.get_model()
+        data = self.get_model(exchange)
         if len(data) > 0:
             stocks_stats = data[0][0]
             stock_symbols = set(stocks_stats.keys())
