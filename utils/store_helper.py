@@ -80,11 +80,23 @@ class StoreHelper:
         self.cursor.execute("INSERT INTO stock_models (created, updated, model, exchange) VALUES (LOCALTIMESTAMP, LOCALTIMESTAMP, Json(%s), %s)", (json_model, exchange))
         self.conn.commit() # <- We MUST commit to reflect the inserted data
 
-    def empty_model(self):
+    def empty_model(self, exchange):
+        if self.filename:
+            self.empty_file_model(exchange)
+        else:
+            self.empty_pg(exchange)
+
+    def empty_file_model(self):
         stocks_stats = {}
         # save an empty model in pickle file
         with open(self.filename, 'wb') as fp:
             pickle.dump(stocks_stats, fp)
+
+    def empty_pg(self, exchange):
+        stocks_stats = {}
+        json_model = json.dumps(stocks_stats)
+        self.cursor.execute("UPDATE stock_models SET updated = LOCALTIMESTAMP, model = Json(%s) WHERE exchange=%s", (json_model, exchange))
+        self.conn.commit() # <- We MUST commit to reflect the inserted data
 
     def get_model_age(self, symbol, exchange):
         if self.filename:
