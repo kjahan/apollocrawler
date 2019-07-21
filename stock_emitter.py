@@ -4,7 +4,9 @@ from random import shuffle
 from .helper import get_stock_symbols
 from .utils.rmq_helper import setup, dispatch
 
-STOCK_EXCHANGES = ['tsx', 'nyse', 'nasdaq']
+STOCK_EXCHANGES = ['nyse', 'nasdaq']
+# STOCK_EXCHANGES = ['nyse', 'nasdaq', 'tsx']
+
 
 def submit_stock_symbols():
     cnt = 0
@@ -18,7 +20,7 @@ def submit_stock_symbols():
             ex_sym = sym + '@' + exchange
             dispatch(channel, ex_sym)
             cnt += 1
-            if cnt >= 20:
+            if cnt >= 10:
                 stop = True
                 break
         if stop:

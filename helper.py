@@ -2,10 +2,8 @@ import requests
 import sys
 import pandas as pd
 import pickle
-import time
 
 import timeout_decorator
-
 from fbprophet import Prophet
 
 from apolloengine.utils import financial_utils
@@ -28,16 +26,16 @@ def download(symbol, exchange):
     history_data_size = 0
     try:
         print("Downloading {} stock symbol ...".format(symbol))
-        history_data_size = financial_utils.download_stock_history_data(symbol, exchange)
+        history_data = financial_utils.download_stock_history_data(symbol, exchange)
     # except timeout_decorator.timeout_decorator.TimeoutError:
     except Exception as e:
         print("Downloading {} stock symbol timed out! {}".format(symbol, str(e)))
-    return history_data_size
+    return history_data
 
-def train_model(symbol, exchange, days_param=90):
+def train_model(prices_df, symbol, exchange, days_param=90):
     key = symbol + '@' + exchange
-    stock_fn = BASE_FOLDER + exchange + '/' + symbol + '.tsv'
-    prices_df = pd.read_csv(stock_fn, sep='\t')
+    # stock_fn = BASE_FOLDER + exchange + '/' + symbol + '.tsv'
+    # prices_df = pd.read_csv(stock_fn, sep='\t')
     if prices_df.empty or prices_df.shape[0] <= days_param:
         return None
     history_slope = financial_utils.compute_slope(prices_df, 'y', days_param)

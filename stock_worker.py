@@ -33,9 +33,10 @@ def callback(ch, method, properties, ex_symbol):
         model_age = storage.get_model_age(symbol, exchange)
         if model_age > MODEL_FRESH_TIME:
             # less than 24 hours so update the model!
-            history_data_size = download(symbol, exchange)
+            history_data = download(symbol, exchange)
+            history_data_size = history_data.shape[0]
             if history_data_size >= DAYS_PARAM:
-                stock_obj = train_model(symbol, exchange, DAYS_PARAM)
+                stock_obj = train_model(history_data, symbol, exchange, DAYS_PARAM)
                 storing_channel.basic_publish(exchange='direct_logs', routing_key='model', body=json.dumps(stock_obj, cls=StockEncoder))
             else:
                 print('Not enough historical data for {}@{} - history size: {}'.format(symbol, exchange, history_data_size))
