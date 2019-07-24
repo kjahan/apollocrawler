@@ -39,6 +39,7 @@ def train_model(prices_df, symbol, exchange, days_param=90):
     if prices_df.empty or prices_df.shape[0] <= days_param:
         return None
     history_slope = financial_utils.compute_slope(prices_df, 'y', days_param)
+    last_price = prices_df.tail(1)['y'].values[0]
     m = Prophet()
     m.fit(prices_df)
     future = m.make_future_dataframe(periods=days_param)
@@ -48,5 +49,10 @@ def train_model(prices_df, symbol, exchange, days_param=90):
     market_cap = financial_utils.get_market_cap(symbol)
     print("Stock symbol: {}, history slope: {}, future slope: {}, market cap: {}"
         .format(symbol, history_slope, future_slope, market_cap))
-    stock_obj = Stock(symbol, exchange, prices_df, history_slope, future_slope, market_cap)
+    stock_obj = Stock(symbol)
+    stock_obj.set_exchange(exchange)
+    stock_obj.set_history_slope(history_slope)
+    stock_obj.set_future_slope(future_slope)
+    stock_obj.set_market_cap(market_cap)
+    stock_obj.set_last_price(last_price)
     return stock_obj
