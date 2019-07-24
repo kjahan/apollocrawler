@@ -20,6 +20,9 @@ queue_name = result.method.queue
 # storage = StoreHelper(STOCK_STATS_FN)
 storage = StoreHelper()
 
+# empty model
+# storage.empty_model('tsx')
+
 # for severity in severities:
 channel.queue_bind(
     exchange='direct_logs', queue=queue_name, routing_key='model')

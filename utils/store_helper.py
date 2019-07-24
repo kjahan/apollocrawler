@@ -134,8 +134,11 @@ class StoreHelper:
             stocks_stats = data[0][0]
             stock_symbols = set(stocks_stats.keys())
             for symbol, stock in stocks_stats.items():
+                market_cap = 0
+                if "market_cap" in stock:
+                    market_cap = stock["market_cap"]
                 stock_obj = Stock(symbol, stock["exchange"], None, 
-                    stock["history_slope"], stock["future_slope"])
+                    stock["history_slope"], stock["future_slope"], market_cap)
                 stock_stats.append(stock_obj)
         return stock_symbols, stock_stats
 

@@ -45,7 +45,8 @@ def train_model(prices_df, symbol, exchange, days_param=90):
     forecast = m.predict(future)
     trend_df = forecast[['trend']].tail(days_param)
     future_slope = financial_utils.compute_slope(trend_df, 'trend', days_param)
-    print("Stock symbol: {}, history slope: {}, future slope: {}"
-        .format(symbol, history_slope, future_slope))
-    stock_obj = Stock(symbol, exchange, prices_df, history_slope, future_slope)
+    market_cap = financial_utils.get_market_cap(symbol)
+    print("Stock symbol: {}, history slope: {}, future slope: {}, market cap: {}"
+        .format(symbol, history_slope, future_slope, market_cap))
+    stock_obj = Stock(symbol, exchange, prices_df, history_slope, future_slope, market_cap)
     return stock_obj
