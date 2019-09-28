@@ -20,7 +20,7 @@ def submit_stock_symbols():
             ex_sym = sym + '@' + exchange
             dispatch(channel, ex_sym)
             cnt += 1
-            if cnt >= 10:
+            if cnt >= 50:
                 stop = True
                 break
         if stop:

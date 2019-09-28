@@ -7,41 +7,42 @@ To run the code you need to setup RabbitMQ and also install pika, requests, and 
 
 ## Create a virtual environment for your crawling project:
 
-conda create -n crawler python=3.7.2 anaconda
+`conda create -n crawler python=3.7.2 anaconda`
 
-## Activate this environment, use
 
-conda activate crawler
+## Activate this environment, run:
+
+`conda activate crawler`
 
 ## Install all required packages:
-conda install -c conda-forge fbprophet
+`conda install -c conda-forge fbprophet`
 
-pip install pandas
+`pip install pandas`
 
-pip install yahoofinancials
+`pip install yahoofinancials`
 
-pip install timeout-decorator
+`pip install timeout-decorator`
 
-pip install requests
+`pip install requests`
 
-pip install pika
+`pip install pika`
 
-pip install psycopg2
+`pip install psycopg2`
 
-## Steps to install RMQ in MacOS and starting rabbitmq:
+# Steps to install RMQ in MacOS and starting rabbitmq:
 
-brew update
+`brew update`
 
-brew install rabbitmq
+`brew install rabbitmq`
 
-brew services start rabbitmq
+`brew services start rabbitmq`
 
-## Start the crawling producer and workers:
+# Start the crawling producer and workers:
 
-python -m apollocrawler.producer
+`python -m apollocrawler.producer`
 
-python -m apollocrawler.worker
+`python -m apollocrawler.worker`
 
 
-## To deactivate the conda environment, use:
-conda deactivate
+# To deactivate the conda environment, run:
+`conda deactivate`

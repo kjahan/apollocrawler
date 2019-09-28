@@ -13,7 +13,7 @@ from apolloengine.encoder import StockEncoder
 DEBUG = False
 DELIMITER = '@'
 DAYS_PARAM = 90
-MODEL_FRESH_TIME = 7*24*3600*1000   # we require 7 days model freshness!
+MODEL_FRESH_TIME = 3*7*24*3600*1000   # we require 3 weeks model freshness!
 
 connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
 storing_channel = connection.channel()

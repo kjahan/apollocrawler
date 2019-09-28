@@ -4,7 +4,7 @@ import time
 import ast
 import json
 
-from apolloengine.stock import Stock
+from apolloengine.src.stock import Stock
 
 
 class StoreHelper:
@@ -134,11 +134,17 @@ class StoreHelper:
             stocks_stats = data[0][0]
             stock_symbols = set(stocks_stats.keys())
             for symbol, stock in stocks_stats.items():
-                market_cap = 0
+                last_price, market_cap = 0, 0
                 if "market_cap" in stock:
                     market_cap = stock["market_cap"]
-                stock_obj = Stock(symbol, stock["exchange"], None, 
-                    stock["history_slope"], stock["future_slope"], market_cap)
+                if "last_price" in stock:
+                    last_price = stock["last_price"]
+                stock_obj = Stock(symbol)
+                stock_obj.set_exchange(stock["exchange"])
+                stock_obj.set_history_slope(stock["history_slope"])
+                stock_obj.set_future_slope(stock["future_slope"])
+                stock_obj.set_market_cap(market_cap)
+                stock_obj.set_last_price(last_price)
                 stock_stats.append(stock_obj)
         return stock_symbols, stock_stats
 
