@@ -7,7 +7,7 @@ from .helper import download, train_model
 from .utils.store_helper import StoreHelper
 from .utils.rmq_helper import setup
 from .utils.constants import STOCK_STATS_FN
-from apolloengine.encoder import StockEncoder
+from apolloengine.src.encoder import StockEncoder
 
 
 DEBUG = False

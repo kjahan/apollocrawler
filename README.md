@@ -39,9 +39,9 @@ To run the code you need to setup RabbitMQ and also install pika, requests, and 
 
 # Start the crawling producer and workers:
 
-`python -m apollocrawler.producer`
+`python -m apollocrawler.stock_emitter`
 
-`python -m apollocrawler.worker`
+`python -m apollocrawler.stock_worker`
 
 
 # To deactivate the conda environment, run:

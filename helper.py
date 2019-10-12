@@ -6,8 +6,8 @@ import pickle
 import timeout_decorator
 from fbprophet import Prophet
 
-from apolloengine.utils import financial_utils
-from apolloengine.stock import Stock
+from apolloengine.src.utils import financial_utils
+from apolloengine.src.stock import Stock
 from .utils.constants import BASE_FOLDER
 from .utils.constants import STOCK_STATS_FN
 
