@@ -6,7 +6,7 @@ import pandas as pd
 
 from .utils.constants import STOCK_STATS_FN
 from .utils.store_helper import StoreHelper
-from apolloengine.stock import Stock
+from apolloengine.src.stock import Stock
  
 
 connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))

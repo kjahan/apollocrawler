@@ -14,6 +14,11 @@ To run the code you need to setup RabbitMQ and also install pika, requests, and 
 
 `conda activate crawler`
 
+# MaxOS:
+
+`unset PYTHONPATH`
+
+
 ## Install all required packages:
 `conda install -c conda-forge fbprophet`
 
@@ -37,12 +42,23 @@ To run the code you need to setup RabbitMQ and also install pika, requests, and 
 
 `brew services start rabbitmq`
 
-# Start the crawling producer and workers:
+## Start the Stock pipeline:
+
+# Start crawling producer (emitting stocks):
 
 `python -m apollocrawler.stock_emitter`
+
+
+# Start crawling producer (analyzing stocks):
 
 `python -m apollocrawler.stock_worker`
 
 
+ # Start saving models stats:
+
+`python -m apollocrawler.model_saver`
+
 # To deactivate the conda environment, run:
 `conda deactivate`
+
+#PGAdmin: p:"pgadmin" and pg db pass: ""

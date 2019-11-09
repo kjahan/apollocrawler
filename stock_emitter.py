@@ -8,7 +8,7 @@ STOCK_EXCHANGES = ['nyse', 'nasdaq']
 # STOCK_EXCHANGES = ['nyse', 'nasdaq', 'tsx']
 
 
-def submit_stock_symbols():
+def submit_stock_symbols(stock_batch_size):
     cnt = 0
     stop = False
     connection, channel = setup('stock_queue')
@@ -20,7 +20,7 @@ def submit_stock_symbols():
             ex_sym = sym + '@' + exchange
             dispatch(channel, ex_sym)
             cnt += 1
-            if cnt >= 50:
+            if cnt >= stock_batch_size:
                 stop = True
                 break
         if stop:
@@ -28,4 +28,5 @@ def submit_stock_symbols():
     connection.close()
 
 if __name__ == "__main__":
-    submit_stock_symbols()
+    stock_batch_size = 10
+    submit_stock_symbols(stock_batch_size)
