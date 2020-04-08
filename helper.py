@@ -23,12 +23,13 @@ def get_stock_symbols(exchange):
 
 def download(symbol, exchange):
     data_path = BASE_FOLDER + exchange
-    history_data_size = 0
+    history_data = pd.DataFrame([{}])
     try:
         print("Downloading {} stock symbol ...".format(symbol))
         history_data = financial_utils.download_stock_history_data(symbol, exchange)
     # except timeout_decorator.timeout_decorator.TimeoutError:
     except Exception as e:
+        history_data = pd.DataFrame([{}])
         print("Downloading {} stock symbol timed out! {}".format(symbol, str(e)))
     return history_data
 

@@ -10,15 +10,6 @@ To run the code you need to setup RabbitMQ and also install pika, requests, and 
 `conda create -n crawler python=3.7.2 anaconda`
 
 
-## Activate this environment, run:
-
-`conda activate crawler`
-
-# MaxOS:
-
-`unset PYTHONPATH`
-
-
 ## Install all required packages:
 `conda install -c conda-forge fbprophet`
 
@@ -44,19 +35,28 @@ To run the code you need to setup RabbitMQ and also install pika, requests, and 
 
 ## Start the Stock pipeline:
 
-# Start crawling producer (emitting stocks):
+## Activate this environment, run:
+
+`conda activate crawler`
+
+# MaxOS:
+
+`unset PYTHONPATH`
+
+# Start crawling producer for emitting stocks (step I):
 
 `python -m apollocrawler.stock_emitter`
 
 
-# Start crawling producer (analyzing stocks):
+# Start saving model predictions (step II):
+
+`python -m apollocrawler.model_saver`
+
+
+# Start workers to analyze stocks (step III)):
 
 `python -m apollocrawler.stock_worker`
 
-
- # Start saving models stats:
-
-`python -m apollocrawler.model_saver`
 
 # To deactivate the conda environment, run:
 `conda deactivate`
