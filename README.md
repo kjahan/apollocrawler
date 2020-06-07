@@ -1,22 +1,13 @@
 # apollocrawler
 Apollo crawler service using RMQ
 
-## Dependencies
+# Dependencies
 
 To run the code you need to setup RabbitMQ and also install pika, requests, and pandas Python libraries.
 
 ## Create a virtual environment for your crawling project:
 
 `conda create -n crawler python=3.7.2 anaconda`
-
-
-## Activate this environment, run:
-
-`conda activate crawler`
-
-# MaxOS:
-
-`unset PYTHONPATH`
 
 
 ## Install all required packages:
@@ -34,7 +25,7 @@ To run the code you need to setup RabbitMQ and also install pika, requests, and 
 
 `pip install psycopg2`
 
-# Steps to install RMQ in MacOS and starting rabbitmq:
+## Steps to install RMQ in MacOS and starting rabbitmq:
 
 `brew update`
 
@@ -44,21 +35,27 @@ To run the code you need to setup RabbitMQ and also install pika, requests, and 
 
 ## Start the Stock pipeline:
 
-# Start crawling producer (emitting stocks):
+## To activate the conda environment, run (for MaxOS run `unset PYTHONPATH`):
+
+`conda activate crawler`
+
+
+## (step I) start crawling producer for emitting stocks:
 
 `python -m apollocrawler.stock_emitter`
 
 
-# Start crawling producer (analyzing stocks):
+## (step II) start saving model predictions :
+
+`python -m apollocrawler.model_saver`
+
+
+## (step III) start workers to analyze stocks:
 
 `python -m apollocrawler.stock_worker`
 
 
- # Start saving models stats:
-
-`python -m apollocrawler.model_saver`
-
-# To deactivate the conda environment, run:
+## To deactivate the conda environment, run:
 `conda deactivate`
 
 #PGAdmin: p:"pgadmin" and pg db pass: ""

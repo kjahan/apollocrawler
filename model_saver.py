@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import pika
 import sys
-import ast
+import json
 import pandas as pd
 
 from .utils.constants import STOCK_STATS_FN
@@ -33,12 +33,15 @@ print(' [*] Waiting for stocks model. To exit press CTRL+C')
 def callback(ch, method, properties, body):
 	str_model = body.decode('utf-8')
 	try:
-		dict_model = ast.literal_eval(str_model)
+		dict_model = json.loads(str_model)
 		print(" [x] %r:%r" % (method.routing_key, dict_model['symbol']))
 		storage.update_model(dict_model)
 	except ValueError:
+		print("ValueError exception raised in model saver! str_model: {}".
+			format(str_model))
 		pass
 
+channel.basic_qos(prefetch_count=1)
 
 channel.basic_consume(
     queue=queue_name, on_message_callback=callback, auto_ack=True)
