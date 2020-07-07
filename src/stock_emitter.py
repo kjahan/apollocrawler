@@ -1,8 +1,8 @@
 import pika
 import random
 
-from .helper import get_stock_symbols
-from .utils.rmq_helper import setup, dispatch
+from apollocrawler.src.helper import get_stock_symbols
+from apollocrawler.utils.rmq_helper import setup, dispatch
 
 STOCK_EXCHANGES = ['nyse', 'nasdaq']
 # STOCK_EXCHANGES = ['nyse', 'nasdaq', 'tsx']
@@ -21,5 +21,5 @@ def submit_stock_symbols(stock_batch_size):
     connection.close()
 
 if __name__ == "__main__":
-    stock_batch_size = 50
+    stock_batch_size = 2
     submit_stock_symbols(stock_batch_size)

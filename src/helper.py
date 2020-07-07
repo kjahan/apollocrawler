@@ -2,14 +2,15 @@ import requests
 import sys
 import pandas as pd
 import pickle
+import numpy as np
 
 import timeout_decorator
 from fbprophet import Prophet
 
 from apolloengine.src.utils import financial_utils
 from apolloengine.src.stock import Stock
-from .utils.constants import BASE_FOLDER
-from .utils.constants import STOCK_STATS_FN
+from apollocrawler.utils.constants import BASE_FOLDER
+from apollocrawler.utils.constants import STOCK_STATS_FN
 
 
 def scrape(url):
@@ -40,13 +41,19 @@ def train_model(prices_df, symbol, exchange, days_param=90):
     if prices_df.empty or prices_df.shape[0] <= days_param:
         return None
     history_slope = financial_utils.compute_slope(prices_df, 'y', days_param)
+    if np.isnan(history_slope):
+        history_slope = -1.0
     last_price = prices_df.tail(1)['y'].values[0]
+    if np.isnan(last_price):
+        last_price = -1.0  
     m = Prophet()
     m.fit(prices_df)
     future = m.make_future_dataframe(periods=days_param)
     forecast = m.predict(future)
     trend_df = forecast[['trend']].tail(days_param)
     future_slope = financial_utils.compute_slope(trend_df, 'trend', days_param)
+    if np.isnan(future_slope):
+        future_slope = -1.0
     market_cap = financial_utils.get_market_cap(symbol)
     print("Stock symbol: {}, history slope: {}, future slope: {}, market cap: {}"
         .format(symbol, history_slope, future_slope, market_cap))

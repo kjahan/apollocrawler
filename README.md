@@ -35,10 +35,11 @@ To run the code you need to setup RabbitMQ and also install pika, requests, and 
 
 ## Start the Stock pipeline:
 
-## To activate the conda environment, run (for MaxOS run `unset PYTHONPATH`):
+## To activate the conda environment, run:
 
 `conda activate crawler`
 
+(for MaxOS run `unset PYTHONPATH`)
 
 ## (step I) start crawling producer for emitting stocks:
 
