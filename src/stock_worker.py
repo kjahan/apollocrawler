@@ -3,10 +3,10 @@ import sys
 import time
 import json
 
-from .helper import download, train_model
-from .utils.store_helper import StoreHelper
-from .utils.rmq_helper import setup
-from .utils.constants import STOCK_STATS_FN
+from apollocrawler.src.helper import download, train_model
+from apollocrawler.utils.store_helper import StoreHelper
+from apollocrawler.utils.rmq_helper import setup
+from apollocrawler.utils.constants import STOCK_STATS_FN
 from apolloengine.src.encoder import StockEncoder
 
 

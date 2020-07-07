@@ -4,8 +4,8 @@ import sys
 import json
 import pandas as pd
 
-from .utils.constants import STOCK_STATS_FN
-from .utils.store_helper import StoreHelper
+from apollocrawler.utils.constants import STOCK_STATS_FN
+from apollocrawler.utils.store_helper import StoreHelper
 from apolloengine.src.stock import Stock
  
 
