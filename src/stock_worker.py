@@ -30,7 +30,7 @@ def callback(ch, method, properties, ex_symbol):
     symbol, exchange = items
     try:
         print('Processing {}@{}'.format(symbol, exchange))
-        model_age = storage.get_model_age(symbol, exchange)
+        model_age = storage.get_model_age(symbol, exchange) # in ms
         if model_age > MODEL_FRESH_TIME:
             # less than 24 hours so update the model!
             history_data = download(symbol, exchange)
@@ -41,7 +41,7 @@ def callback(ch, method, properties, ex_symbol):
             else:
                 print('Not enough historical data for {}@{} - history size: {}'.format(symbol, exchange, history_data_size))
         else:
-            print('Model for {}@{} is fresh!'.format(symbol, exchange))
+            print('Model age for {}@{}: {} hours - fresh skipping ...'.format(symbol, exchange, round(model_age/(3600.0*1000), 2)))
     except Exception as e:
         print(str(e))
         pass
