@@ -21,5 +21,5 @@ def submit_stock_symbols(stock_batch_size):
     connection.close()
 
 if __name__ == "__main__":
-    stock_batch_size = 2
+    stock_batch_size = 50
     submit_stock_symbols(stock_batch_size)
